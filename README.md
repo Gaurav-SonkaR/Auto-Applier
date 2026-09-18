@@ -208,3 +208,4 @@ py -m pytest tests/integration/ -v
 - CAPTCHAs are never bypassed — jobs are flagged for manual review
 - Cold email has a hard 40/day limit enforced in code
 - Gmail App Password is used, never your regular Google password
+ 
