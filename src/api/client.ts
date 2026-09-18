@@ -107,3 +107,54 @@ export function withToken(url: string): string {
   if (!token) return url
   return `${url}${url.includes('?') ? '&' : '?'}token=${encodeURIComponent(token)}`
 }
+
+// Compatibility exports for older components. New code should import from the
+// domain modules (jobs.ts, dashboard.ts, runs.ts, and resumes.ts), but these
+// wrappers keep the existing public client API type-safe during the migration.
+import type {
+  ColdEmailImportResponse,
+  ColdEmailPreview,
+  ColdEmailStartRequest,
+  ColdEmailStats,
+  DashboardStats,
+  DiscoveryQuota,
+  Job,
+  JobListResponse,
+  RunLog,
+  RunStartRequest,
+  RunStartResponse,
+} from '../types'
+
+export const startRun = (body: RunStartRequest) =>
+  request<RunStartResponse>('/runs/start', { method: 'POST', body: JSON.stringify(body) })
+
+export const getDiscoveryQuota = () => request<DiscoveryQuota>('/runs/discovery-quota')
+
+export const getColdEmailStats = () => request<ColdEmailStats>('/cold-email/stats')
+
+export const uploadColdEmailFile = (file: File) => {
+  const form = new FormData()
+  form.append('file', file)
+  return upload<ColdEmailImportResponse>('/cold-email/import', form)
+}
+
+export const startColdEmail = (body: ColdEmailStartRequest) =>
+  request<RunStartResponse>('/cold-email/start', { method: 'POST', body: JSON.stringify(body) })
+
+export const getHumanQueue = (params?: { limit?: number; offset?: number }) =>
+  request<JobListResponse>(`/dashboard/human-queue${qs({ ...params })}`)
+
+export const setJobOutcome = (jobId: number, outcome: string) =>
+  request<Job>(`/jobs/${jobId}/outcome`, {
+    method: 'PATCH',
+    body: JSON.stringify({ outcome }),
+  })
+
+export const resumeDownloadUrl = (jobId: number) =>
+  withToken(`${BASE}/resumes/${jobId}`)
+
+export const getColdEmailPreview = () => request<ColdEmailPreview>('/cold-email/preview')
+
+export const getStats = () => request<DashboardStats>('/dashboard/stats')
+
+export const getRuns = () => request<RunLog[]>('/runs/')

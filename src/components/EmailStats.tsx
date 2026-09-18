@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { getColdEmailStats, uploadColdEmailFile, startColdEmail } from '../api/client'
-import type { ColdEmailStartRequest, UploadResponse } from '../types'
+import type { ColdEmailImportResponse, ColdEmailStartRequest } from '../types'
 
 export function EmailStats() {
   const qc = useQueryClient()
@@ -11,13 +11,10 @@ export function EmailStats() {
     refetchInterval: 30_000,
   })
 
-  const [uploadedFile, setUploadedFile] = useState<UploadResponse | null>(null)
-  const [form, setForm] = useState<Omit<ColdEmailStartRequest, 'file_path'>>({
+  const [uploadedFile, setUploadedFile] = useState<ColdEmailImportResponse | null>(null)
+  const [form, setForm] = useState<Omit<ColdEmailStartRequest, 'excel_path'>>({
     role: '',
     batch_size: 10,
-    gmail_address: '',
-    gmail_app_password: '',
-    resume_per_tech_stack: true,
   })
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
@@ -31,7 +28,7 @@ export function EmailStats() {
 
   const startMut = useMutation({
     mutationFn: () =>
-      startColdEmail({ ...form, file_path: uploadedFile!.file_path }),
+      startColdEmail({ ...form, excel_path: uploadedFile!.saved_path }),
     onSuccess: (data) => {
       setSuccess(`Campaign started — Run #${data.run_id}`)
       setError(null)
@@ -40,7 +37,7 @@ export function EmailStats() {
     onError: (e: Error) => setError(e.message),
   })
 
-  const percentUsed = stats ? Math.min(100, Math.round((stats.sent_today / stats.daily_limit) * 100)) : 0
+  const percentUsed = stats ? Math.min(100, Math.round((stats.sent / (stats.sent + stats.remaining_today)) * 100)) : 0
 
   return (
     <div className="space-y-5">
@@ -51,10 +48,10 @@ export function EmailStats() {
         <div className="card space-y-3">
           <h3 className="text-sm font-semibold">Cold Email Quota</h3>
           <div className="flex justify-between text-xs text-slate-400">
-            <span>Sent today: <strong className="text-violet-400">{stats.sent_today}</strong></span>
-            <span>Limit: {stats.daily_limit}</span>
-            <span>Total: {stats.sent_total}</span>
-            <span>Failed: {stats.failed_total}</span>
+            <span>Sent today: <strong className="text-violet-400">{stats.sent}</strong></span>
+            <span>Remaining: {stats.remaining_today}</span>
+            <span>Total: {stats.total}</span>
+            <span>Failed: {stats.failed}</span>
           </div>
           <div className="w-full bg-slate-700 rounded-full h-2">
             <div
@@ -122,54 +119,13 @@ export function EmailStats() {
           </div>
         </div>
 
-        <div>
-          <label className="label">Gmail Address</label>
-          <input
-            className="input"
-            type="email"
-            placeholder="you@gmail.com"
-            value={form.gmail_address}
-            onChange={(e) => setForm({ ...form, gmail_address: e.target.value })}
-          />
-        </div>
-
-        <div>
-          <label className="label">Gmail App Password</label>
-          <input
-            className="input"
-            type="password"
-            placeholder="xxxx xxxx xxxx xxxx"
-            value={form.gmail_app_password}
-            onChange={(e) => setForm({ ...form, gmail_app_password: e.target.value })}
-          />
-          <p className="text-xs text-slate-500 mt-1">
-            Use an App Password, not your regular password.
-            <a className="text-indigo-400 ml-1 hover:underline" href="https://myaccount.google.com/apppasswords" target="_blank" rel="noreferrer">
-              Generate →
-            </a>
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <input
-            id="resume_per_stack"
-            type="checkbox"
-            className="accent-indigo-500 w-4 h-4"
-            checked={form.resume_per_tech_stack}
-            onChange={(e) => setForm({ ...form, resume_per_tech_stack: e.target.checked })}
-          />
-          <label htmlFor="resume_per_stack" className="text-xs text-slate-400 cursor-pointer">
-            Generate separate resume per tech stack
-          </label>
-        </div>
-
         {error && <p className="text-xs text-red-400">{error}</p>}
         {success && <p className="text-xs text-emerald-400">{success}</p>}
 
         <button
           type="button"
           className="btn-primary w-full"
-          disabled={!uploadedFile || !form.gmail_address || !form.gmail_app_password || startMut.isPending}
+          disabled={!uploadedFile || startMut.isPending}
           onClick={() => startMut.mutate()}
         >
           {startMut.isPending ? 'Starting…' : 'Send Emails'}

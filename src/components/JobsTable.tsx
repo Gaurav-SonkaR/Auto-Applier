@@ -8,6 +8,7 @@ const STATUS_COLORS: Record<JobStatus, string> = {
   SCRAPED:           'bg-slate-600 text-slate-200',
   PARSED:            'bg-blue-900 text-blue-300',
   RESUME_READY:      'bg-indigo-900 text-indigo-300',
+  READY_TO_APPLY:    'bg-violet-900 text-violet-300',
   APPLIED:           'bg-emerald-900 text-emerald-300',
   FAILED:            'bg-red-900 text-red-300',
   FLAGGED:           'bg-amber-900 text-amber-300',
@@ -21,7 +22,7 @@ const STATUS_COLORS: Record<JobStatus, string> = {
 }
 
 const STATUSES: JobStatus[] = [
-  'SCRAPED', 'PARSED', 'RESUME_READY', 'APPLIED', 'FAILED', 'FLAGGED',
+  'SCRAPED', 'PARSED', 'RESUME_READY', 'READY_TO_APPLY', 'APPLIED', 'FAILED', 'FLAGGED',
   'WAITING_CAPTCHA', 'WAITING_LOGIN', 'WAITING_OTP', 'NEED_HUMAN_ACTION',
   'DUPLICATE', 'SKIPPED', 'BLACKLISTED',
 ]

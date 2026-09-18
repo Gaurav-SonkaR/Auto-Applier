@@ -21,10 +21,10 @@ const PRE_EXCLUDED_LABELS: Record<string, string> = {
 }
 
 function completedSteps(job: Job): number {
-  if (job.status === 'APPLIED') return 5
+  if (job.status === 'APPLIED' || job.status === 'READY_TO_APPLY') return 5
   let n = 1 // "Found" is always true once a job row exists
-  if (job.jd_text) n = 2
-  if (job.parsed_jd) n = 3
+  if (!['SCRAPED'].includes(job.status)) n = 2
+  if (!['SCRAPED', 'PARSED'].includes(job.status)) n = 3
   if (job.resume_path) n = 4
   return n
 }
