@@ -1,0 +1,17 @@
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# Vite / editor noise
+.vite/
+*.tsbuildinfo
+
+# No secrets belong in the frontend — anything in a VITE_* var ships to the
+# browser — but an .env here would still be someone's local config.
+.env
+.env.*
+!.env.example
+
+.DS_Store
+*.log

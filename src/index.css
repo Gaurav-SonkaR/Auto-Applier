@@ -4,23 +4,25 @@
 
 @layer base {
   body {
-    @apply bg-slate-900 text-slate-100 antialiased;
+    @apply bg-gray-50 text-gray-900 antialiased;
   }
 
   ::-webkit-scrollbar {
     @apply w-1.5;
   }
   ::-webkit-scrollbar-track {
-    @apply bg-slate-800;
+    @apply bg-gray-100;
   }
   ::-webkit-scrollbar-thumb {
-    @apply bg-slate-600 rounded;
+    @apply bg-gray-300 rounded hover:bg-gray-400;
   }
 }
 
 @layer components {
+  /* Cards sit on the gray-50 page. A hairline border plus a very soft shadow
+     separates them; on a light theme a border alone reads flat. */
   .card {
-    @apply bg-slate-800 rounded-xl border border-slate-700 p-5;
+    @apply bg-white rounded-xl border border-gray-200 p-5 shadow-sm;
   }
 
   .badge {
@@ -30,28 +32,33 @@
   .btn {
     @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium
            transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2
-           focus:ring-offset-slate-900 disabled:opacity-50 disabled:cursor-not-allowed;
+           focus:ring-offset-white disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   .btn-primary {
-    @apply btn bg-indigo-600 hover:bg-indigo-500 text-white focus:ring-indigo-500;
+    @apply btn bg-brand-600 hover:bg-brand-700 text-white focus:ring-brand-500;
   }
 
   .btn-danger {
-    @apply btn bg-red-600 hover:bg-red-500 text-white focus:ring-red-500;
+    @apply btn bg-red-600 hover:bg-red-700 text-white focus:ring-red-500;
   }
 
+  /* Secondary buttons need a border here — a plain gray fill on a white card
+     has too little contrast to read as a control. */
   .btn-secondary {
-    @apply btn bg-slate-700 hover:bg-slate-600 text-slate-200 focus:ring-slate-500;
+    @apply btn bg-white border border-gray-300 hover:bg-gray-100 text-gray-700
+           focus:ring-gray-400;
   }
 
+  /* White fields on white cards, separated by the border. A gray fill would
+     read as disabled on a light theme. */
   .input {
-    @apply w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-sm
-           text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2
-           focus:ring-indigo-500 focus:border-transparent;
+    @apply w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm
+           text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2
+           focus:ring-brand-500 focus:border-transparent;
   }
 
   .label {
-    @apply block text-xs font-medium text-slate-400 mb-1;
+    @apply block text-xs font-medium text-gray-600 mb-1;
   }
 }

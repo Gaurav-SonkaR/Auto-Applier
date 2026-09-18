@@ -1,20 +1,23 @@
-import { useState, useEffect } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { getStats } from '../api/client'
+import { useEffect, useRef, useState } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { getStats } from '../api/dashboard'
 import { useActiveRun } from '../hooks/useRuns'
-import { StatsCards } from '../components/StatsCards'
-import { PipelineFunnel } from '../components/PipelineFunnel'
-import { RunControls } from '../components/RunControls'
-import { CompanyCareerCard } from '../components/CompanyCareerCard'
-import { ProgressBar } from '../components/ProgressBar'
-import { JobsTable } from '../components/JobsTable'
-import { EmailStats } from '../components/EmailStats'
+import { StatsCards } from '../components/common/StatsCards'
+import { PipelineFunnel } from '../components/common/PipelineFunnel'
+import { RefreshButton } from '../components/common/RefreshButton'
+import { RunControls } from '../components/runs/RunControls'
+import { CompanyCareerCard } from '../components/runs/CompanyCareerCard'
+import { ProgressBar } from '../components/common/ProgressBar'
+import { JobsTable } from '../components/jobs/JobsTable'
+import { EmailStats } from '../components/runs/EmailStats'
 import { useWebSocket } from '../hooks/useWebSocket'
 import type { DashboardStats } from '../types'
 
 type Tab = 'jobs' | 'emails'
 
 export function Dashboard() {
+  const qc = useQueryClient()
+
   // watchedRunId = the run whose WebSocket feed is being displayed
   const [watchedRunId, setWatchedRunId] = useState<number | null>(null)
   const [tab, setTab] = useState<Tab>('jobs')
@@ -27,17 +30,46 @@ export function Dashboard() {
     }
   }, [activeRun, watchedRunId])
 
-  const { data: stats, isLoading: statsLoading } = useQuery({
+  // No refetchInterval — the dashboard never polls. Data loads once and is
+  // refreshed by: the RefreshButton below, any mutation elsewhere on the page
+  // (starting/stopping a run, retrying a job, ...), or a live run's own
+  // WebSocket telling us a job just finished (see the effect after
+  // useWebSocket — that is a push signal from an already-open connection,
+  // not a new poll).
+  const { data: stats, isLoading: statsLoading, isFetching: statsFetching } = useQuery({
     queryKey: ['stats'],
     queryFn: getStats,
-    refetchInterval: 15_000,
   })
 
   const { events, wsState, clearEvents } = useWebSocket(watchedRunId)
 
+  // While a run is live, its WS feed already pushes one event per job. When a
+  // job finishes we know the run's counters and the jobs table changed, so we
+  // refresh those — driven by that push, not a timer. This is what keeps the
+  // dashboard live during a run without polling anything on an interval.
+  const lastHandledEvent = useRef(0)
+  useEffect(() => {
+    if (events.length === lastHandledEvent.current) return
+    const newEvents = events.slice(lastHandledEvent.current)
+    lastHandledEvent.current = events.length
+    if (newEvents.some((e) => e.node === 'done')) {
+      qc.invalidateQueries({ queryKey: ['runs'] })
+      qc.invalidateQueries({ queryKey: ['stats'] })
+      qc.invalidateQueries({ queryKey: ['jobs'] })
+    }
+  }, [events, qc])
+
+  const handleRefreshAll = () => {
+    qc.invalidateQueries({ queryKey: ['stats'] })
+    qc.invalidateQueries({ queryKey: ['runs'] })
+    qc.invalidateQueries({ queryKey: ['jobs'] })
+    qc.invalidateQueries({ queryKey: ['cold-email-stats'] })
+  }
+
   const handleRunStarted = (runId: number) => {
     if (runId !== watchedRunId) {
       clearEvents()
+      lastHandledEvent.current = 0
       setWatchedRunId(runId)
     }
   }
@@ -49,6 +81,11 @@ export function Dashboard() {
 
   return (
     <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-lg font-bold text-gray-900">Dashboard</h1>
+        <RefreshButton onRefresh={handleRefreshAll} isRefreshing={statsFetching} label="Refresh all" />
+      </div>
+
       {/* Stats row */}
       <StatsCards stats={stats ?? emptyStats} isLoading={statsLoading} />
 
@@ -74,15 +111,15 @@ export function Dashboard() {
 
       {/* Tab panel */}
       <div className="space-y-3">
-        <div className="flex gap-1 border-b border-slate-700">
+        <div className="flex gap-1 border-b border-gray-200">
           {(['jobs', 'emails'] as Tab[]).map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
               className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${
                 tab === t
-                  ? 'bg-slate-800 text-slate-100 border border-b-0 border-slate-700'
-                  : 'text-slate-500 hover:text-slate-300'
+                  ? 'bg-white text-brand-700 border border-b-0 border-gray-200'
+                  : 'text-gray-500 hover:text-gray-700'
               }`}
             >
               {t === 'jobs' ? 'All Jobs' : 'Cold Emails'}
@@ -104,6 +141,7 @@ const emptyStats: DashboardStats = {
   scraped: 0,
   parsed: 0,
   resume_ready: 0,
+  ready_to_apply: 0,
   applied: 0,
   failed: 0,
   flagged: 0,

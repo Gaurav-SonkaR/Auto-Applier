@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
+import { withToken } from '../api/client'
 import type { FlowEvent } from '../types'
 
 type WSState = 'connecting' | 'open' | 'closed' | 'error'
@@ -22,7 +23,11 @@ export function useWebSocket(runId: number | null) {
     }
 
     const proto = window.location.protocol === 'https:' ? 'wss' : 'ws'
-    const ws = new WebSocket(`${proto}://${window.location.host}/ws/runs/${id}`)
+    // ?token= rather than a header — the browser can't set headers on a
+    // WebSocket handshake. The backend rejects pre-accept if it's missing.
+    const ws = new WebSocket(
+      withToken(`${proto}://${window.location.host}/ws/runs/${id}`),
+    )
     wsRef.current = ws
     setWsState('connecting')
 

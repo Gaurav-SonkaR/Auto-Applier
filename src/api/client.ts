@@ -1,97 +1,109 @@
-import type {
-  DashboardStats,
-  DiscoveryQuota,
-  Job,
-  JobListResponse,
-  JobTimeline,
-  RunLog,
-  RunStartRequest,
-  RunStartResponse,
-  ColdEmailStartRequest,
-  ColdEmailStats,
-  UploadResponse,
-} from '../types'
+/** Shared fetch configuration. Domain calls live in jobs.ts / resumes.ts /
+ *  runs.ts / dashboard.ts / auth.ts and all go through `request` here. */
 
-const BASE = '/api'
+export const BASE = '/api'
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${BASE}${path}`, {
-    headers: { 'Content-Type': 'application/json', ...init?.headers },
-    ...init,
-  })
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({ detail: res.statusText }))
-    throw new Error(body.detail ?? res.statusText)
+/** Read straight from storage rather than importing from auth.ts — that module
+ *  imports `request` from here, and going the other way would be a cycle. */
+const TOKEN_KEY = 'autoapply.token'
+
+function readToken(): string | null {
+  try {
+    return localStorage.getItem(TOKEN_KEY)
+  } catch {
+    return null
   }
+}
+
+export class ApiError extends Error {
+  constructor(message: string, readonly status: number) {
+    super(message)
+    this.name = 'ApiError'
+  }
+}
+
+async function toError(res: Response): Promise<ApiError> {
+  const body = await res.json().catch(() => null)
+  // FastAPI validation errors arrive as a list of {loc, msg}; flatten them so
+  // the UI shows "job_title: field required" instead of "[object Object]".
+  const detail = body?.detail
+  if (Array.isArray(detail)) {
+    return new ApiError(
+      detail.map((d: { loc?: string[]; msg?: string }) =>
+        `${d.loc?.slice(1).join('.') ?? 'field'}: ${d.msg ?? 'invalid'}`).join('; '),
+      res.status,
+    )
+  }
+  return new ApiError(
+    typeof detail === 'string' ? detail : res.statusText || 'Request failed',
+    res.status,
+  )
+}
+
+/** A 401 anywhere means the token is gone or expired. Clear it and let the
+ *  app fall back to the login screen, rather than leaving every page stuck
+ *  showing errors against a session that can never recover. */
+function handleUnauthorized(path: string) {
+  // The login call itself 401s on wrong credentials — that's a normal form
+  // error, not an expired session, so don't wipe anything.
+  if (path.startsWith('/auth/login')) return
+  try {
+    localStorage.removeItem(TOKEN_KEY)
+    localStorage.removeItem('autoapply.username')
+  } catch {
+    /* nothing to clear */
+  }
+  window.dispatchEvent(new Event('autoapply:auth-changed'))
+}
+
+function authHeaders(): Record<string, string> {
+  const token = readToken()
+  return token ? { Authorization: `Bearer ${token}` } : {}
+}
+
+export async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  const res = await fetch(`${BASE}${path}`, {
+    ...init,
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeaders(),
+      ...init?.headers,
+    },
+  })
+  if (res.status === 401) handleUnauthorized(path)
+  if (!res.ok) throw await toError(res)
+  // 204 No Content has no body to parse.
+  if (res.status === 204) return undefined as T
   return res.json() as Promise<T>
 }
 
-// Dashboard
-export const getStats = () => request<DashboardStats>('/dashboard/stats')
-
-export const getHumanQueue = (params?: { limit?: number; offset?: number }) => {
-  const qs = new URLSearchParams()
-  if (params?.limit) qs.set('limit', String(params.limit))
-  if (params?.offset) qs.set('offset', String(params.offset))
-  return request<JobListResponse>(`/dashboard/human-queue?${qs}`)
+/** Multipart POST — no Content-Type header, the browser sets the boundary. */
+export async function upload<T>(path: string, form: FormData): Promise<T> {
+  const res = await fetch(`${BASE}${path}`, {
+    method: 'POST',
+    body: form,
+    headers: authHeaders(),
+  })
+  if (res.status === 401) handleUnauthorized(path)
+  if (!res.ok) throw await toError(res)
+  return res.json() as Promise<T>
 }
 
-// Jobs
-export const getJobs = (params?: {
-  status?: string
-  portal?: string
-  source?: 'portal' | 'career_site'
-  limit?: number
-}) => {
-  const qs = new URLSearchParams()
-  if (params?.status) qs.set('status', params.status)
-  if (params?.portal) qs.set('portal', params.portal)
-  if (params?.source) qs.set('source', params.source)
-  if (params?.limit) qs.set('limit', String(params.limit))
-  return request<JobListResponse>(`/jobs/?${qs}`)
-}
-
-export const getJob = (id: number) => request<Job>(`/jobs/${id}`)
-
-export const getJobTimeline = (id: number) => request<JobTimeline>(`/jobs/${id}/timeline`)
-
-export const retryJob = (id: number) =>
-  request<Job>(`/jobs/${id}/retry`, { method: 'POST' })
-
-export const setJobOutcome = (id: number, outcome: string) =>
-  request<Job>(`/jobs/${id}/outcome`, { method: 'PATCH', body: JSON.stringify({ outcome }) })
-
-export const jobScreenshotUrl = (jobId: number) => `${BASE}/jobs/${jobId}/screenshot`
-
-// Runs
-export const startRun = (body: RunStartRequest) =>
-  request<RunStartResponse>('/runs/start', { method: 'POST', body: JSON.stringify(body) })
-
-export const stopRun = (runId: number) =>
-  request<{ message: string }>(`/runs/${runId}/stop`, { method: 'POST' })
-
-export const getRun = (runId: number) => request<RunLog>(`/runs/${runId}`)
-
-export const getRuns = () => request<RunLog[]>('/runs/')
-
-export const getDiscoveryQuota = () => request<DiscoveryQuota>('/runs/discovery-quota')
-
-// Resume download
-export const resumeDownloadUrl = (jobId: number) => `${BASE}/resumes/${jobId}`
-
-// Cold email
-export const uploadColdEmailFile = async (file: File): Promise<UploadResponse> => {
-  const form = new FormData()
-  form.append('file', file)
-  const res = await fetch(`${BASE}/cold-email/import`, { method: 'POST', body: form })
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({ detail: res.statusText }))
-    throw new Error(body.detail ?? res.statusText)
+/** Build a query string, omitting empty values. */
+export function qs(params: Record<string, string | number | undefined>): string {
+  const search = new URLSearchParams()
+  for (const [key, value] of Object.entries(params)) {
+    if (value !== undefined && value !== '') search.set(key, String(value))
   }
-  return res.json()
+  const str = search.toString()
+  return str ? `?${str}` : ''
 }
 
-export const startColdEmail = (body: ColdEmailStartRequest) =>
-  request<RunStartResponse>('/cold-email/start', { method: 'POST', body: JSON.stringify(body) })
-
-export const getColdEmailStats = () => request<ColdEmailStats>('/cold-email/stats')
+/** Append the auth token to a URL the browser fetches directly — file
+ *  downloads via <a href> and the WebSocket handshake can't carry an
+ *  Authorization header. */
+export function withToken(url: string): string {
+  const token = readToken()
+  if (!token) return url
+  return `${url}${url.includes('?') ? '&' : '?'}token=${encodeURIComponent(token)}`
+}
