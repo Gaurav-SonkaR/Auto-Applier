@@ -6,7 +6,7 @@
 // export const BASE = '/api'
 
 // Cloudflare tunnel backend:
-export const BASE = 'https://historical-physiology-cottages-notices.trycloudflare.com/api'
+export const BASE = '/api'
 
 /** Read straight from storage rather than importing from auth.ts — that module
  *  imports `request` from here, and going the other way would be a cycle. */
