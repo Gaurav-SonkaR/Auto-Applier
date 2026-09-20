@@ -1,7 +1,12 @@
 /** Shared fetch configuration. Domain calls live in jobs.ts / resumes.ts /
  *  runs.ts / dashboard.ts / auth.ts and all go through `request` here. */
 
-export const BASE = '/api'
+
+// Local backend:
+// export const BASE = '/api'
+
+// Cloudflare tunnel backend:
+export const BASE = 'https://todd-fossil-que-map.trycloudflare.com/api'
 
 /** Read straight from storage rather than importing from auth.ts — that module
  *  imports `request` from here, and going the other way would be a cycle. */

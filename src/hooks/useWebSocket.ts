@@ -28,6 +28,14 @@ export function useWebSocket(runId: number | null) {
     const ws = new WebSocket(
       withToken(`${proto}://${window.location.host}/ws/runs/${id}`),
     )
+
+    // Local WebSocket:
+    // const wsUrl = withToken(`${proto}://${window.location.host}/ws/runs/${id}`)
+
+    // Cloudflare tunnel WebSocket:
+    const wsUrl = withToken(`wss://todd-fossil-que-map.trycloudflare.com/ws/runs/${id}`)
+
+    // const ws = new WebSocket(wsUrl)
     wsRef.current = ws
     setWsState('connecting')
 
