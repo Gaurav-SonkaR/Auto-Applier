@@ -13,17 +13,17 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'https://todd-fossil-que-map.trycloudflare.com/',
+        target: 'https://historical-physiology-cottages-notices.trycloudflare.com/',
         // Local:
         // target: 'http://127.0.0.1:8000',
-        target: 'https://todd-fossil-que-map.trycloudflare.com',
+        target: 'https://historical-physiology-cottages-notices.trycloudflare.com',
         changeOrigin: true,
       },
       '/ws': {
         target: 'ws://127.0.0.1:8000',
         // Local:
         // target: 'ws://127.0.0.1:8000',
-        target: 'https://todd-fossil-que-map.trycloudflare.com',
+        target: 'https://historical-physiology-cottages-notices.trycloudflare.com',
         ws: true,
         changeOrigin: true,
         rewriteWsOrigin: true,
