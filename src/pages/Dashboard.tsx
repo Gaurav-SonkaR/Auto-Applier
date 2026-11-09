@@ -41,23 +41,22 @@ export function Dashboard() {
     queryFn: getStats,
   })
 
-  const { events, wsState, clearEvents } = useWebSocket(watchedRunId)
+  const isWatchedRunActive = activeRun?.run_id === watchedRunId
+  const { events, wsState, clearEvents, doneEventCount } =
+    useWebSocket(watchedRunId, isWatchedRunActive)
 
   // While a run is live, its WS feed already pushes one event per job. When a
   // job finishes we know the run's counters and the jobs table changed, so we
   // refresh those — driven by that push, not a timer. This is what keeps the
   // dashboard live during a run without polling anything on an interval.
-  const lastHandledEvent = useRef(0)
+  const lastHandledDoneEvent = useRef(0)
   useEffect(() => {
-    if (events.length === lastHandledEvent.current) return
-    const newEvents = events.slice(lastHandledEvent.current)
-    lastHandledEvent.current = events.length
-    if (newEvents.some((e) => e.node === 'done')) {
-      qc.invalidateQueries({ queryKey: ['runs'] })
-      qc.invalidateQueries({ queryKey: ['stats'] })
-      qc.invalidateQueries({ queryKey: ['jobs'] })
-    }
-  }, [events, qc])
+    if (doneEventCount === lastHandledDoneEvent.current) return
+    lastHandledDoneEvent.current = doneEventCount
+    qc.invalidateQueries({ queryKey: ['runs'] })
+    qc.invalidateQueries({ queryKey: ['stats'] })
+    qc.invalidateQueries({ queryKey: ['jobs'] })
+  }, [doneEventCount, qc])
 
   const handleRefreshAll = () => {
     qc.invalidateQueries({ queryKey: ['stats'] })
@@ -69,7 +68,7 @@ export function Dashboard() {
   const handleRunStarted = (runId: number) => {
     if (runId !== watchedRunId) {
       clearEvents()
-      lastHandledEvent.current = 0
+      lastHandledDoneEvent.current = 0
       setWatchedRunId(runId)
     }
   }

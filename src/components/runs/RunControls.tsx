@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { startRun } from '../../api/runs'
@@ -31,8 +31,7 @@ function ActiveRunCard({ run, onStop }: { run: RunLog; onStop: () => void }) {
   const stopMut = useStopRun()
 
   const handleStop = () => {
-    stopMut.mutate(run.run_id)
-    onStop()
+    stopMut.mutate(run.run_id, { onSuccess: onStop })
   }
 
   return (
@@ -60,6 +59,10 @@ function ActiveRunCard({ run, onStop }: { run: RunLog; onStop: () => void }) {
           {stopMut.isPending ? 'Stopping…' : '⏹ Stop'}
         </button>
       </div>
+
+      {stopMut.isError && (
+        <p className="text-xs text-red-600">Could not stop run: {(stopMut.error as Error).message}</p>
+      )}
 
       {/* Counter grid */}
       <div className="grid grid-cols-5 gap-2 text-center">
@@ -251,7 +254,7 @@ function RunHistory({ runs, onWatch }: { runs: RunLog[]; onWatch: (id: number) =
           </thead>
           <tbody className="divide-y divide-gray-200">
             {runs.map((r) => (
-              <>
+              <Fragment key={r.run_id}>
                 <tr
                   key={r.run_id}
                   className="hover:bg-gray-50 transition-colors cursor-pointer"
@@ -319,7 +322,7 @@ function RunHistory({ runs, onWatch }: { runs: RunLog[]; onWatch: (id: number) =
                     </td>
                   </tr>
                 )}
-              </>
+              </Fragment>
             ))}
           </tbody>
         </table>

@@ -210,6 +210,17 @@ function ResumeMatchCard({ jobId }: { jobId: number }) {
   // empty card would just be noise.
   if (isLoading || isError || !data || data.matches.length === 0) return null
 
+  if (data.jd_terms.length === 0) {
+    return (
+      <div className="card border-amber-200 bg-amber-50">
+        <p className="text-xs text-amber-800">
+          No job-description skills or keywords were extracted, so uploaded resumes cannot be
+          meaningfully ranked. Review the posting before choosing a resume.
+        </p>
+      </div>
+    )
+  }
+
   const [best, ...rest] = data.matches
 
   return (

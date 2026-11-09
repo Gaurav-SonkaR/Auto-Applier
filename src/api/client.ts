@@ -6,7 +6,7 @@
 // export const BASE = '/api'
 
 // Cloudflare tunnel backend:
-export const BASE = '/api'
+export const BASE = 'http://127.0.0.1:8000/api'
 
 /** Read straight from storage rather than importing from auth.ts — that module
  *  imports `request` from here, and going the other way would be a cycle. */

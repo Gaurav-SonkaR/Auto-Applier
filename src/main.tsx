@@ -2,12 +2,15 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import App from './App'
+import { ApiError } from './api/client'
 import './index.css'
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: 1,
+      retry: (failureCount, error) =>
+        !(error instanceof ApiError && error.status >= 400 && error.status < 500) &&
+        failureCount < 1,
       // Data is fetched once and never re-fetched on its own — no timers, no
       // refetch-on-window-focus, no refetch-on-reconnect. Every page that
       // shows server data has its own RefreshButton (components/common) for

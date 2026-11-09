@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { startRun } from '../api/client'
 import { useRuns, useStopRun } from '../hooks/useRuns'
@@ -210,7 +210,7 @@ function RunHistory({ runs, onWatch }: { runs: RunLog[]; onWatch: (id: number) =
           </thead>
           <tbody className="divide-y divide-slate-700/50">
             {runs.map((r) => (
-              <>
+              <Fragment key={r.run_id}>
                 <tr
                   key={r.run_id}
                   className="hover:bg-slate-800/40 transition-colors cursor-pointer"
@@ -278,7 +278,7 @@ function RunHistory({ runs, onWatch }: { runs: RunLog[]; onWatch: (id: number) =
                     </td>
                   </tr>
                 )}
-              </>
+              </Fragment>
             ))}
           </tbody>
         </table>

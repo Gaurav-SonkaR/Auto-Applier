@@ -7,14 +7,20 @@ type WSState = 'connecting' | 'open' | 'closed' | 'error'
 const RECONNECT_DELAY_MS = 3000
 const MAX_EVENTS = 200
 
-export function useWebSocket(runId: number | null) {
+export function useWebSocket(runId: number | null, shouldReconnect = runId !== null) {
   const [events, setEvents] = useState<FlowEvent[]>([])
+  const [doneEventCount, setDoneEventCount] = useState(0)
   const [wsState, setWsState] = useState<WSState>('closed')
   const wsRef = useRef<WebSocket | null>(null)
   const reconnectTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const activeRunId = useRef<number | null>(null)
+  const shouldReconnectRef = useRef(shouldReconnect)
+  shouldReconnectRef.current = shouldReconnect
 
-  const clearEvents = useCallback(() => setEvents([]), [])
+  const clearEvents = useCallback(() => {
+    setEvents([])
+    setDoneEventCount(0)
+  }, [])
 
   const connect = useCallback((id: number) => {
     if (wsRef.current) {
@@ -44,6 +50,7 @@ export function useWebSocket(runId: number | null) {
     ws.onmessage = (ev) => {
       try {
         const event: FlowEvent = JSON.parse(ev.data as string)
+        if (event.node === 'done') setDoneEventCount((count) => count + 1)
         setEvents((prev) => {
           const next = [...prev, event]
           return next.length > MAX_EVENTS ? next.slice(-MAX_EVENTS) : next
@@ -57,7 +64,7 @@ export function useWebSocket(runId: number | null) {
 
     ws.onclose = () => {
       setWsState('closed')
-      if (activeRunId.current !== null) {
+      if (shouldReconnectRef.current && activeRunId.current !== null) {
         reconnectTimer.current = setTimeout(() => {
           if (activeRunId.current !== null) connect(activeRunId.current)
         }, RECONNECT_DELAY_MS)
@@ -66,10 +73,10 @@ export function useWebSocket(runId: number | null) {
   }, [])
 
   useEffect(() => {
-    activeRunId.current = runId
+    activeRunId.current = shouldReconnect ? runId : null
     if (reconnectTimer.current) clearTimeout(reconnectTimer.current)
 
-    if (runId !== null) {
+    if (runId !== null && shouldReconnect) {
       connect(runId)
     } else {
       if (wsRef.current) {
@@ -89,7 +96,7 @@ export function useWebSocket(runId: number | null) {
         wsRef.current = null
       }
     }
-  }, [runId, connect])
+  }, [runId, shouldReconnect, connect])
 
-  return { events, wsState, clearEvents }
+  return { events, wsState, clearEvents, doneEventCount }
 }

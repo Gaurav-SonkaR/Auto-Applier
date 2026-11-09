@@ -22,8 +22,7 @@ function ActiveDiscoveryRunCard({ run, onStop }: { run: RunLog; onStop: () => vo
   const stopMut = useStopRun()
 
   const handleStop = () => {
-    stopMut.mutate(run.run_id)
-    onStop()
+    stopMut.mutate(run.run_id, { onSuccess: onStop })
   }
 
   return (
@@ -48,6 +47,10 @@ function ActiveDiscoveryRunCard({ run, onStop }: { run: RunLog; onStop: () => vo
           {stopMut.isPending ? 'Stopping…' : '⏹ Stop'}
         </button>
       </div>
+
+      {stopMut.isError && (
+        <p className="text-xs text-red-600">Could not stop run: {(stopMut.error as Error).message}</p>
+      )}
 
       <div className="grid grid-cols-5 gap-2 text-center">
         {([
@@ -82,8 +85,14 @@ function QuotaBanner() {
   // differently-keyed copy of useDiscoveryQuota() in hooks/useRuns.ts (that
   // one keyed ['runs', 'discovery-quota']), so the two never even shared a
   // cache entry. Consolidated onto the one hook; no polling either way now.
-  const { data: quota } = useDiscoveryQuota()
+  const { data: quota, isLoading, isError } = useDiscoveryQuota()
 
+  if (isLoading) {
+    return <p className="text-xs text-gray-500">Checking today&apos;s search quota…</p>
+  }
+  if (isError) {
+    return <p className="text-xs text-red-600">Could not load the discovery quota. Refresh and try again.</p>
+  }
   if (!quota) return null
 
   if (!quota.serper_configured) {
@@ -109,6 +118,8 @@ function StartForm({ onStarted }: { onStarted: (id: number) => void }) {
   const [location, setLocation] = useState('')
   const [batchSize, setBatchSize] = useState(10)
   const [error, setError] = useState<string | null>(null)
+  const quotaQuery = useDiscoveryQuota()
+  const quota = quotaQuery.data
 
   const startMut = useMutation({
     mutationFn: startRun,
@@ -167,7 +178,10 @@ function StartForm({ onStarted }: { onStarted: (id: number) => void }) {
       <button
         type="submit"
         className="btn-primary w-full"
-        disabled={startMut.isPending}
+        disabled={
+          startMut.isPending || quotaQuery.isLoading || quotaQuery.isError ||
+          !quota?.serper_configured || quota.remaining_today <= 0
+        }
       >
         {startMut.isPending ? 'Starting…' : '🔎 Start Smart Search'}
       </button>
