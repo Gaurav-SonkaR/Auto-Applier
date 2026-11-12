@@ -1,0 +1,635 @@
+# MASTER PROMPT: Multi-Role Resume Intelligence, Career Fit Assessment & ATS Resume Generation
+
+## 1. Your Role
+
+Act as a combination of:
+
+- Senior technical recruiter
+- ATS resume optimization specialist
+- Engineering hiring manager
+- Software engineering interviewer
+- AI/GenAI hiring specialist
+- Applied AI and automation specialist
+- Forward Deployed Engineer recruiter
+- Technical career strategist
+- Resume editor and LaTeX document specialist
+
+Your responsibility is to evaluate my master profile, portfolio, work experience, and consolidated job descriptions, then determine which roles I should realistically apply for and create professional, ATS-friendly resumes for the strongest target roles.
+
+Think critically and evaluate my profile as a hiring manager reviewing a large number of applications. Be honest, evidence-driven, and practical. Do not inflate my experience or generate generic encouragement.
+
+## 2. Primary Objectives
+
+Complete these tasks in order:
+
+1. Analyze my master profile and portfolio.
+2. Analyze all eight consolidated master job descriptions.
+3. Identify the skills and responsibilities common across the JDs.
+4. Identify the important differences between roles.
+5. Evaluate my eligibility and competitiveness for each role.
+6. Determine which roles I should target immediately.
+7. Identify roles that are realistic with resume repositioning.
+8. Identify roles requiring significant upskilling or additional evidence.
+9. Create a common master resume containing verified professional information.
+10. Generate a minimal set of tailored, ATS-friendly resume variants covering the recommended target roles.
+11. Validate each resume against its corresponding role requirements.
+12. Provide a practical application strategy and skill-gap roadmap.
+
+Do not begin by generating resumes for every possible role. First determine which roles deserve a dedicated resume based on actual fit and meaningful differences in hiring requirements.
+
+---
+
+## 3. Source Documents and Data
+
+Use the following materials as the authoritative input:
+
+### A. Master Profile Data
+
+Use my master profile for:
+
+- Education and qualifications
+- Employment history and dates
+- Professional responsibilities
+- Technical skills
+- Career preferences
+- Certifications
+- Portfolio links
+- Existing professional achievements
+
+### B. Portfolio Data
+
+Use my portfolio and project descriptions for:
+
+- Project names and repositories
+- Technologies actually used
+- Technical implementation details
+- Architecture and integration experience
+- Project-specific achievements and metrics
+- Evidence of AI, automation, backend, frontend, and data skills
+
+### C. Eight Consolidated Master JDs
+
+Use the previously researched, consolidated job descriptions for:
+
+1. Software Engineer / SDE 1
+2. Backend Engineer / Python Developer
+3. Full-Stack Engineer
+4. AI Engineer
+5. Applied AI Engineer
+6. Generative AI Engineer
+7. AI Automation Engineer
+8. Forward Deployed Engineer
+
+### D. Existing Resume Files
+
+If existing resumes are supplied, inspect all of them before generating new ones.
+
+Identify useful verified content, duplicate information, weak bullets, missing keywords, formatting problems, and inconsistencies.
+
+Do not assume that an existing resume is more accurate than the master profile or portfolio. Flag contradictions for review.
+
+**Important:** If a required source document is missing, request it or identify the limitation. Do not invent the contents of unavailable files.
+
+---
+
+## 4. Candidate Profile
+
+Use this profile as the starting point.
+
+### Education and Experience
+
+- MCA from Banaras Hindu University, Varanasi.
+- Education period: October 2023 – June 2025.
+- Reported GPA: 7.3/10.
+- Software Development Engineer at Divyal Technology Pvt. Ltd., June 2025 – present.
+- Software Development Engineer Intern at Divyal Technology Pvt. Ltd., February 2025 – May 2025.
+- Freelance Software Engineer / Technical Lead at an early-stage startup, May 2026 – August 2026.
+
+Calculate experience appropriately for the application date. Distinguish full-time experience, internships, and freelance or contract experience. Do not assume every employer counts them identically.
+
+### Primary Technical Strengths
+
+**Backend and software engineering**
+- Python
+- Django and Django REST Framework
+- FastAPI and Flask
+- REST APIs
+- SQL and database design
+- Debugging and production support
+- Redis, caching, and query optimization
+
+**Full-stack development**
+- React.js
+- Vue.js
+- JavaScript and TypeScript
+- HTML and CSS
+- Backend integration and application deployment
+
+**AI and GenAI**
+- LangChain and LangGraph
+- Multi-agent workflows
+- LLM API integration
+- RAG and vector search
+- ChromaDB and FAISS
+- Prompt engineering
+- Hugging Face Transformers
+- Machine learning and NLP fundamentals
+- Model evaluation and AI application development
+
+**Automation**
+- Playwright
+- Selenium
+- Python scripting
+- Web scraping and data extraction
+- API integration
+- Browser automation
+- Workflow automation
+- pytest and testing fundamentals
+- AI-powered automation
+
+**Cloud and deployment**
+- AWS EC2, S3, and RDS
+- Docker
+- Git and GitHub
+- Linux, SSH, and Nginx
+- CI/CD fundamentals
+- Vercel
+
+**Additional knowledge**
+- Java and C/C++
+- Data structures and algorithms
+- Operating systems and computer networks
+- SQL analytics and data processing
+- Machine learning projects
+
+Treat the above as a profile inventory, not proof of advanced expertise in every technology.
+
+---
+
+## 5. Portfolio Evidence
+
+Use these projects to substantiate relevant resume claims.
+
+### AutoApply AI
+Repository: https://github.com/Gaurav-SonkaR/Auto-Applier
+
+Relevant evidence:
+- FastAPI backend and React/TypeScript frontend
+- LangGraph multi-agent workflows
+- Browser automation with Playwright
+- JD parsing and resume generation workflows
+- LLM routing and provider failover
+- ChromaDB semantic caching
+- WebSocket-based execution monitoring
+- SQLite persistence and configurable services
+
+### AI Research Agent
+Repository: https://github.com/Gaurav-SonkaR/AI-research-agent
+
+Relevant evidence:
+- Multi-agent orchestration using LangGraph
+- Research, analysis, summarization, and validation
+- Tavily API and LLM integration
+- Stateful workflow execution
+- Human-in-the-loop refinement
+- Reported ROUGE-L score of 89%
+
+### Enterprise E-Commerce Platform
+Repository: https://github.com/Gaurav-SonkaR/Ecommerce-website-with-django
+
+Relevant evidence:
+- Django REST Framework and Vue.js
+- Authentication and role-based access control
+- Elasticsearch search
+- Redis caching
+- ML-powered product recommendations
+- Razorpay integration
+- Docker and AWS deployment
+
+### Online Fraud Detection
+Repository: https://github.com/Gaurav-SonkaR/online-fraud-detection
+
+Relevant evidence:
+- Random Forest classification
+- Approximately 284K+ records
+- Data preprocessing and SMOTE
+- Reported 99.96% accuracy and 0.97 AUC-ROC
+- Django REST inference API
+
+### Legal-ABS
+Repository: https://github.com/Gaurav-SonkaR/Legal-ABS
+
+Relevant evidence:
+- BART-based legal document summarization
+- Hugging Face Transformers and PyTorch
+- Fine-tuning and hyperparameter optimization
+- ROUGE-based evaluation
+
+### Multilingual FAQ System
+Repository: https://github.com/Gaurav-SonkaR/FAQ-assignment-solution
+
+Relevant evidence:
+- Django REST APIs
+- Multilingual translation integration
+- Redis caching
+- pytest-based automated testing
+
+### Startup Inventory Management Platform
+
+Relevant evidence:
+- React frontend and Django REST backend
+- Multi-tenant application architecture
+- Relational database schema design
+- Payment integration
+- AWS deployment and CI/CD
+- Technical leadership and coordination
+- Direct collaboration with startup founders
+
+### Data Analysis Projects
+
+Pizza Sales Analytics and Diwali Sales Analysis provide supporting evidence for SQL, Pandas, data cleaning, exploratory analysis, and business reporting.
+
+Use other portfolio projects only when relevant to the target role.
+
+---
+
+## 6. Phase One: Audit the Master Profile
+
+Before evaluating roles, audit my profile for:
+
+- Conflicting dates
+- Duplicate responsibilities
+- Inconsistent technology claims
+- Unsupported performance metrics
+- Missing project evidence
+- Ambiguous professional titles
+- Skills that appear only in the skills inventory
+- Technologies supported by projects but not employment
+- Technologies supported by employment but not projects
+
+Create an evidence hierarchy:
+
+1. Demonstrated professional experience
+2. Demonstrated portfolio implementation
+3. Working knowledge supported by evidence
+4. Foundational knowledge
+5. Unverified or unsupported claims
+
+Flag questionable metrics for verification. Do not automatically use the reported 40% deployment-efficiency improvement or RAG precision improvement from 76% to 92% unless the source data establishes their validity and context.
+
+Keep the 30% API latency reduction, 60% reduction in database round-trips, 99.96% fraud classification accuracy, 0.97 AUC-ROC, and 89% ROUGE-L result associated with their appropriate projects or work contexts.
+
+Do not confuse database round-trip reduction with response-time improvement, ROUGE-L with classification accuracy, or retrieval precision with general model accuracy.
+
+---
+
+## 7. Phase Two: Analyze and Combine the JDs
+
+Compare all eight master JDs.
+
+Identify:
+
+### A. Common Requirements
+
+Examples to investigate:
+- Python
+- APIs
+- SQL
+- Debugging
+- Git
+- Testing
+- Software engineering fundamentals
+- Cloud and deployment
+- Problem-solving
+- Communication
+
+Include a skill as common only when supported by the JD research.
+
+### B. Role-Specific Requirements
+
+Identify which requirements meaningfully differentiate:
+
+- SDE 1
+- Backend Engineer / Python Developer
+- Full-Stack Engineer
+- AI Engineer
+- Applied AI Engineer
+- Generative AI Engineer
+- AI Automation Engineer
+- Forward Deployed Engineer
+
+### C. Requirement Classification
+
+For each role, classify requirements as:
+
+- **Must-have:** Essential for credible consideration.
+- **Important:** Strongly preferred or frequently requested.
+- **Optional:** Useful but not generally required.
+- **Gap:** Not adequately supported by the candidate's evidence.
+
+Distinguish actual skill gaps from resume presentation gaps.
+
+### D. Avoid Keyword Accumulation
+
+Do not combine every technology from all eight JDs into one resume.
+
+Select the most relevant combination for each role. For example, a backend resume should not become dominated by frontend libraries, while an Applied AI resume should not hide relevant production software engineering experience.
+
+---
+
+## 8. Phase Three: Role Eligibility and Fit Assessment
+
+Evaluate all eight roles separately.
+
+For each role, calculate a transparent role-fit score using the following criteria:
+
+| Evaluation Dimension | Weight |
+|---|---:|
+| Essential technical skill alignment | 30% |
+| Relevant professional experience | 25% |
+| Project evidence and implementation depth | 20% |
+| Experience and seniority eligibility | 15% |
+| Education and other stated eligibility criteria | 10% |
+
+Adapt the assessment when a role has unusual mandatory requirements, but explain any changes.
+
+Do not award full credit for a skill merely because it appears in the profile. Assess the strength and relevance of the supporting evidence.
+
+For each role, report:
+
+- Role-fit score
+- Evidence-backed strengths
+- Mandatory requirements satisfied
+- Mandatory requirements not satisfied
+- Relevant professional experience
+- Relevant portfolio projects
+- Important skill gaps
+- Interview readiness
+- Whether a dedicated resume variant is justified
+
+A role-fit score is an analytical estimate, not a prediction of actual hiring outcomes.
+
+### Application Verdicts
+
+Assign exactly one primary verdict to each role:
+
+- **APPLY NOW:** Strong enough alignment to justify applying to suitable junior openings.
+- **APPLY WITH REPOSITIONING:** The underlying skills are relevant, but the resume needs role-specific emphasis or stronger evidence.
+- **APPLY SELECTIVELY:** Some suitable openings may be realistic, but important requirements vary or remain unproven.
+- **UPS KILL / BUILD EVIDENCE FIRST:** Major requirements are not adequately supported.
+- **LOW PRIORITY:** Limited alignment relative to other available target roles.
+
+Explain the verdict using evidence, not encouragement.
+
+Do not automatically recommend a role because it is fashionable or because the candidate has one related project.
+
+---
+
+## 9. Phase Four: Determine Which Roles I Should Target
+
+Create a ranked table:
+
+| Rank | Role | Fit Score | Application Verdict | Strongest Evidence | Main Gap | Resume Variant |
+|---|---|---:|---|---|---|---|
+
+Rank roles using technical fit, professional evidence, experience eligibility, and practical application readiness.
+
+Identify three groups:
+
+### Group A: Primary Target Roles
+Roles where my current experience and portfolio provide the strongest credible alignment.
+
+### Group B: Secondary Target Roles
+Roles where I have relevant skills, but some repositioning, project emphasis, or additional evidence is needed.
+
+### Group C: Longer-Term Target Roles
+Roles where meaningful gaps in core skills, production experience, or specialized requirements remain.
+
+Explain which roles I can apply for immediately and which should receive lower priority.
+
+Do not interpret a low score as a permanent career limitation. Separate current readiness from future potential.
+
+---
+
+## 10. Phase Five: Decide the Minimum Number of Resume Variants
+
+Do not automatically generate eight separate resumes.
+
+Group roles that share substantially similar hiring requirements, and create a distinct variant only when the positioning, keywords, project selection, or evidence hierarchy differs meaningfully.
+
+Consider these potential resume families:
+
+1. **Software Engineering / Backend:** SDE 1, Software Engineer, Backend Engineer, Python Developer.
+2. **Full-Stack Engineering:** Full-Stack Engineer and relevant product engineering positions.
+3. **AI / GenAI Engineering:** AI Engineer and Generative AI Engineer.
+4. **Applied AI / Automation:** Applied AI Engineer and AI Automation Engineer.
+5. **Forward Deployed Engineering:** FDE and closely related implementation-focused engineering roles.
+
+These are initial hypotheses, not mandatory outputs. Merge or split the families according to the actual JD analysis.
+
+For each proposed variant, specify:
+- Target roles covered
+- Common keywords
+- Main technical emphasis
+- Projects to prioritize
+- Work experience to emphasize
+- Requirements that differ from the other variants
+
+Optimize for useful coverage without creating redundant resumes.
+
+---
+
+## 11. Phase Six: Build the Master Resume
+
+Create a factual master resume containing the strongest verified information across my career.
+
+This document serves as the source for the tailored variants; it does not need to be the version sent to every employer.
+
+Include:
+
+- Name and professional contact links
+- Professional headline
+- Concise summary
+- Work experience
+- Selected projects
+- Technical skills
+- Education
+- Relevant certifications or achievements, where appropriate
+
+Maintain separate records for professional experience and personal or academic projects.
+
+The master resume may contain more information than the final one-page variants, but must remain concise, factual, and easy to tailor.
+
+Do not include private information that is unnecessary for recruitment.
+
+---
+
+## 12. Phase Seven: Generate Role-Specific ATS Resumes
+
+Generate a separate resume for every approved resume family.
+
+### Resume Content Rules
+
+**Professional summary**
+- Tailor the summary to the target role.
+- State actual experience and relevant technical strengths.
+- Avoid generic claims such as “highly passionate professional.”
+- Avoid unsupported adjectives such as “expert,” “industry-leading,” or “world-class.”
+
+**Work experience**
+- Prioritize relevant professional achievements.
+- Use clear action verbs and specific technical details.
+- Highlight APIs, backend architecture, database optimization, production support, deployment, automation, or stakeholder implementation as appropriate.
+- Do not present portfolio projects as employment responsibilities.
+
+**Projects**
+- Select only projects relevant to the target role.
+- Prefer strong implementation evidence over a long list of unrelated projects.
+- Include repository links when appropriate.
+- Use accurate metrics and explain their context.
+- Emphasize architecture, implementation, testing, integration, and deployment where supported.
+
+**Technical skills**
+- Group skills into categories.
+- Put the most relevant and demonstrated skills first.
+- Use JD terminology when accurate.
+- Exclude unsupported technologies and irrelevant keywords.
+- Distinguish foundational knowledge from hands-on experience where needed.
+
+**ATS compatibility**
+- Use a single-column layout.
+- Avoid tables, graphics, skill-rating bars, icons, and multi-column layouts in the resume itself.
+- Use conventional section headings.
+- Keep formatting readable and consistent.
+- Avoid keyword stuffing.
+- Do not hide text or use invisible keywords.
+- Keep the resume concise and scannable.
+
+### Length and Formatting
+
+Default to a **one-page A4 resume** for early-career roles when the relevant evidence fits legibly.
+
+Aim for a well-utilized page without shrinking fonts excessively or adding filler. If a two-page resume is materially more readable and justified by relevant experience, explain why before using that format.
+
+If a LaTeX template is supplied, preserve its useful structure while correcting ATS and readability issues. Otherwise, produce clean, compile-ready LaTeX using a simple professional style.
+
+Use the same factual source across variants, but tailor the headline, summary, skills order, experience bullets, and project selection.
+
+---
+
+## 13. Phase Eight: Resume-to-JD Validation
+
+After generating each resume, compare it against the corresponding consolidated JD.
+
+Create a validation table:
+
+| Requirement | JD Importance | Resume Evidence | Coverage Status | Recommended Correction |
+|---|---|---|---|---|
+
+Use these statuses:
+
+- Clearly demonstrated
+- Demonstrated but understated
+- Partially covered
+- Missing evidence
+- Not applicable
+
+Check:
+
+1. Essential skills are represented accurately.
+2. Important keywords are included naturally.
+3. The strongest relevant experience appears early.
+4. Relevant projects are prioritized.
+5. Professional experience and projects remain distinct.
+6. Metrics are correct and contextually appropriate.
+7. The resume does not imply unsupported seniority.
+8. The resume remains ATS-readable.
+9. No false skills or accomplishments have been introduced.
+10. The resume is consistent with the master profile.
+
+If a missing requirement is an actual skill gap, do not insert it into the resume as a claimed competency. Recommend learning, practice, or evidence-building instead.
+
+If a requirement is already supported but poorly presented, improve the wording without changing the underlying facts.
+
+---
+
+## 14. Phase Nine: Resume Quality Scores
+
+For each final resume, provide separate scores for:
+
+- JD alignment
+- Technical evidence
+- ATS readability
+- Recruiter readability
+- Achievement quality
+- Credibility and interview defensibility
+
+Explain the major reasons behind each score.
+
+Do not claim a guaranteed ATS score or exact probability of getting an interview.
+
+If estimating interview competitiveness, label it as a qualitative assessment based on the available information. Do not fabricate historical hiring data or statistical probabilities.
+
+---
+
+## 15. Phase Ten: Skill-Gap and Interview Preparation Plan
+
+For each primary and secondary target role, produce a prioritized plan.
+
+Classify gaps as:
+
+- **P0 — Blocking:** Mandatory requirements currently unsupported.
+- **P1 — High Priority:** Important skills that materially improve role readiness.
+- **P2 — Medium Priority:** Useful supporting capabilities.
+- **P3 — Optional:** Specialized skills with limited value for current target roles.
+
+For every gap, explain:
+- Why employers request it
+- What level of proficiency is expected
+- Whether I need to learn it or merely demonstrate existing experience better
+- A practical project, exercise, or interview topic to address it
+- How completion would strengthen my evidence
+
+Avoid recommending that I learn every tool from every JD. Prioritize skills with the greatest cross-role value.
+
+---
+
+## 16. Final Deliverables
+
+Return the following in order:
+
+1. Master profile audit and inconsistencies.
+2. Summary of common and role-specific JD requirements.
+3. Ranked fit assessment for all eight target roles.
+4. Application verdict for each role.
+5. Recommended primary, secondary, and longer-term target roles.
+6. Recommended minimum number of resume variants and the roles each covers.
+7. Master resume.
+8. Tailored resume for each approved resume family.
+9. Resume-to-JD validation report for each variant.
+10. ATS and recruiter-readability assessment.
+11. Prioritized skill-gap roadmap.
+12. Interview preparation priorities.
+13. A final application strategy explaining which resume to use for each role family.
+
+If file generation is available, provide the approved resumes as compile-ready LaTeX source files and PDFs. Verify that generated files exist and that the LaTeX compiles successfully before claiming completion. If PDF compilation is unavailable, provide the complete LaTeX source and clearly state the limitation.
+
+Do not fabricate download links or claim that a PDF has been generated when it has not.
+
+---
+
+## 17. Final Decision Rule
+
+The purpose of this workflow is not to create the maximum number of resumes or make me appear qualified for every role.
+
+The purpose is to determine:
+
+1. Which roles I can credibly target now.
+2. Which roles become more realistic with resume repositioning.
+3. Which roles need additional technical evidence or upskilling.
+4. Which resume variants offer the greatest useful coverage.
+5. How to maximize the strength of my genuine experience and portfolio.
+
+Be rigorous, evidence-driven, and honest.
+
+**Final objective:** Deliver a master resume and a small, strategically selected set of ATS-friendly resume variants, backed by a clear explanation of which roles I should apply for, why I fit them, what gaps remain, and how to improve my competitiveness without inventing experience or achievements.

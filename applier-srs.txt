@@ -1,0 +1,592 @@
+# Software Requirements Specification
+
+## Document Control
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0 | 2024-01-15 | AI Architecture Team | Initial SRS based on consolidated requirements |
+
+---
+
+## 1. Project Overview
+
+### 1.1 Project Name
+**AutoApply AI** — Intelligent Job Discovery and Resume Generation System
+
+### 1.2 Project Description
+AutoApply AI is an autonomous job discovery and resume tailoring system that scrapes job postings from multiple portals, analyzes job descriptions using LLMs, generates ATS-optimized PDF resumes via LaTeX compilation, and presents them for manual application by the user.
+
+### 1.3 Business Problem
+Job seekers face significant time investment in:
+- Manually searching across multiple job portals
+- Reading and understanding job requirements
+- Customizing resumes for each position
+- Tracking application status
+
+This system automates discovery and resume preparation while keeping the application step human-controlled to ensure legal compliance and quality control.
+
+### 1.4 Proposed Solution
+A containerized web application that:
+1. Scrapes job postings from configured portals on demand
+2. Parses job descriptions using LLM to extract key requirements
+3. Matches user profile against job requirements
+4. Generates tailored LaTeX resume and compiles to PDF
+5. Presents organized list of opportunities with downloadable resumes
+6. Tracks job application status manually entered by user
+
+### 1.5 Project Objectives
+- Reduce job search time by 80%
+- Increase resume-to-job match quality through LLM analysis
+- Maintain ATS compatibility through LaTeX-generated PDFs
+- Operate at near-zero cost using free cloud tiers
+- Ensure legal compliance by avoiding automated application submission
+
+---
+
+## 2. Project Context
+
+### 2.1 Confirmed Requirements
+- Single-user system (MVP scope)
+- Oracle Cloud Always Free Tier infrastructure (4 ARM cores, 24GB RAM)
+- SQLite database for simplicity
+- Docker containerization for deployment consistency
+- Manual application process (not automated submission)
+- No email automation (legal compliance)
+
+### 2.2 Previously Discussed Decisions
+- Multi-cloud architecture abandoned in favor of single Oracle Cloud instance
+- PostgreSQL deferred in favor of SQLite for MVP
+- Redis/Celery simplified to Python RQ or direct threading
+- Cold email feature removed due to CAN-SPAM/GDPR concerns
+- Auto-application removed due to TOS/legal concerns
+
+### 2.3 Important Assumptions
+- User has technical capability to manage Oracle Cloud resources
+- Job portals provide public access to listings without authentication
+- User will review each generated resume before manual application
+- Single-language support (English) sufficient for MVP
+
+---
+
+## 3. Scope
+
+### 3.1 In Scope
+- Job scraping from LinkedIn, Indeed, Naukri, and company career pages
+- LLM-powered job description analysis
+- LaTeX-based resume generation with ATS optimization
+- PDF compilation and storage
+- Web dashboard for job viewing and resume download
+- Manual application tracking
+- SQLite database for job and application storage
+
+### 3.2 Out of Scope
+- Automated job application submission
+- Email automation or cold outreach
+- Multi-user support/tenant isolation
+- Real-time job alerts/notifications
+- Mobile application
+- Payment processing
+- Advanced analytics or reporting
+- Integration with applicant tracking systems (ATS)
+
+---
+
+## 4. Stakeholders
+
+| Stakeholder | Role | Interest |
+|-------------|------|----------|
+| Job Seeker (Primary User) | End user | Efficient job search and quality resume generation |
+| Development Team | Builder | Maintainable, cost-effective solution |
+| Oracle Cloud | Infrastructure Provider | Resource utilization within free tier limits |
+| Job Portals | Data Source | Prevent scraping abuse, maintain TOS compliance |
+
+---
+
+## 5. Target Users
+
+### 5.1 Primary User: Job Seeker
+
+**Role:** Active job seeker applying to multiple positions
+
+**Goals:**
+- Discover relevant job opportunities efficiently
+- Create tailored resumes quickly
+- Track application status
+- Organize job search process
+
+**Permissions:**
+- Full access to all system features
+- Configure scraping parameters
+- Download generated resumes
+- Update application status
+
+**Main Activities:**
+1. Trigger job scraping for specific criteria
+2. Review scraped jobs and select for resume generation
+3. Download tailored resumes
+4. Apply manually using generated resume
+5. Update application status in system
+
+---
+
+## 6. User Personas
+
+### Persona 1: Gaurav (Primary)
+
+**Background:** Software engineer with 3-5 years experience seeking new opportunities
+
+**Technical Proficiency:** Basic computer skills, can navigate web applications
+
+**Pain Points:**
+- Spending 2-3 hours daily searching and customizing resumes
+- Difficulty tracking which version of resume sent where
+- Missing opportunities due to slow manual process
+
+**Goals:**
+- Reduce daily job search time to 30 minutes
+- Increase interview callback rate with better-tailored resumes
+- Maintain organized record of applications
+
+---
+
+## 7. Functional Requirements
+
+### FR-001: Job Scraping
+
+**ID:** FR-001  
+**Description:** System shall scrape job postings from configured portals based on user-specified criteria  
+**Priority:** High  
+**Source:** Core feature requirement  
+**Acceptance Criteria:**
+- Support LinkedIn, Indeed, Naukri job portals
+- Accept search parameters: keywords, location, experience level
+- Scrape job title, company, description, URL, posting date
+- Implement rate limiting (minimum 5-second delay between requests)
+- Rotate User-Agent strings to avoid detection
+- Store scraped jobs in database with deduplication
+
+### FR-002: Job Description Analysis
+
+**ID:** FR-002  
+**Description:** System shall analyze job descriptions using LLM to extract key requirements and skills  
+**Priority:** High  
+**Source:** Core feature requirement  
+**Acceptance Criteria:**
+- Parse raw HTML job descriptions
+- Extract required skills, experience level, education requirements
+- Identify key responsibilities and qualifications
+- Match against user master profile
+- Store parsed data in structured format (JSON)
+
+### FR-003: Resume Generation
+
+**ID:** FR-003  
+**Description:** System shall generate tailored LaTeX resume based on job requirements  
+**Priority:** High  
+**Source:** Core feature requirement  
+**Acceptance Criteria:**
+- Use predefined LaTeX template
+- Customize content based on job requirements matching
+- Include only relevant skills and experiences
+- Generate valid LaTeX code
+- Compile to PDF using pdflatex with -no-shell-escape flag
+
+### FR-004: PDF File Management
+
+**ID:** FR-004  
+**Description:** System shall save generated PDFs with standardized naming convention  
+**Priority:** High  
+**Source:** User requirement  
+**Acceptance Criteria:**
+- Filename format: `Gaurav_sonkar_YYYY-MM-DD_{job-title}_{company}_{hash}.pdf`
+- Sanitize special characters from job title and company name
+- Store in persistent storage accessible via web interface
+- Provide download endpoint for generated PDFs
+- Prevent filename collisions using hash
+
+### FR-005: Job Dashboard
+
+**ID:** FR-005  
+**Description:** System shall provide web interface to view scraped jobs and manage resumes  
+**Priority:** High  
+**Source:** Core feature requirement  
+**Acceptance Criteria:**
+- Display list of scraped jobs with filtering by status
+- Show job details: title, company, description, posting date
+- Indicate which jobs have generated resumes
+- Provide "Generate Resume" button for each job
+- Enable PDF download from job detail view
+
+### FR-006: Application Tracking
+
+**ID:** FR-006  
+**Description:** System shall allow manual tracking of job application status  
+**Priority:** Medium  
+**Source:** User requirement  
+**Acceptance Criteria:**
+- Update job status: New, Resume Generated, Applied, Interview, Rejected, Closed
+- Store application date when status changed to Applied
+- Display status history with timestamps
+- Filter jobs by application status
+
+### FR-007: Scraping Trigger
+
+**ID:** FR-007  
+**Description:** System shall provide mechanism to initiate job scraping on demand  
+**Priority:** High  
+**Source:** Core feature requirement  
+**Acceptance Criteria:**
+- API endpoint to trigger scraping job
+- Accept parameters: portals, keywords, location, max results
+- Return job ID for status tracking
+- Show real-time progress via WebSocket or polling
+- Prevent concurrent scraping jobs
+
+### FR-008: Resume Template Management
+
+**ID:** FR-008  
+**Description:** System shall maintain LaTeX resume template with customizable sections  
+**Priority:** Medium  
+**Source:** Technical requirement  
+**Acceptance Criteria:**
+- Store master LaTeX template in version control
+- Define replaceable sections: skills, experience, summary
+- Support ATS-friendly formatting (no tables, standard fonts)
+- Include compiler directives for fonts and packages
+
+---
+
+## 8. User Stories
+
+### US-001: Trigger Job Scraping
+
+**As a** job seeker,  
+**I want to** initiate a job search across multiple portals with specific keywords,  
+**So that** I can discover relevant opportunities without manually checking each site.
+
+**Acceptance Criteria:**
+- Can enter keywords, location, and select portals
+- See real-time progress of scraping
+- Receive notification when scraping completes
+- View total jobs found
+
+### US-002: Generate Tailored Resume
+
+**As a** job seeker,  
+**I want to** generate a customized resume for a specific job posting,  
+**So that** my application highlights relevant skills and experiences.
+
+**Acceptance Criteria:**
+- Click "Generate Resume" on job detail page
+- System analyzes job description against my profile
+- LaTeX is generated and compiled to PDF
+- PDF is saved with descriptive filename
+- Can download PDF immediately
+
+### US-003: Track Application Status
+
+**As a** job seeker,  
+**I want to** update the status of jobs I've applied to,  
+**So that** I can track my pipeline and follow-ups.
+
+**Acceptance Criteria:**
+- Change status from dropdown: Applied, Interview, Rejected, etc.
+- See date when status was last updated
+- Filter job list by status
+- View count of jobs in each status
+
+### US-004: Download Resume
+
+**As a** job seeker,  
+**I want to** download a generated resume PDF,  
+**So that** I can attach it to my job application.
+
+**Acceptance Criteria:**
+- Download button available on job detail page
+- PDF opens in browser or downloads to device
+- Filename is descriptive and includes date
+
+---
+
+## 9. Use Cases
+
+### UC-001: Complete Job Search and Application Workflow
+
+**Actor:** Job Seeker  
+**Preconditions:** User has accessed dashboard, master profile configured  
+**Postconditions:** Resume generated and ready for manual application
+
+**Main Flow:**
+1. User clicks "New Search" button
+2. System presents search form with keywords, location, portals
+3. User enters "Python Developer", "Remote", selects LinkedIn and Indeed
+4. User clicks "Start Scraping"
+5. System initiates background scraping job
+6. System displays progress indicator
+7. System completes scraping, shows "47 jobs found"
+8. User reviews job list, clicks on "Senior Python Engineer at TechCorp"
+9. System displays job details
+10. User clicks "Generate Resume"
+11. System analyzes job description using LLM
+12. System generates LaTeX code tailored to job
+13. System compiles LaTeX to PDF
+14. System saves PDF with filename `Gaurav_sonkar_2024-01-15_Senior_Python_Engineer_TechCorp_a7f3d2.pdf`
+15. System enables "Download Resume" button
+16. User clicks download, saves PDF locally
+17. User manually applies on TechCorp careers page using generated resume
+18. User returns to dashboard, marks job as "Applied"
+
+**Alternative Flows:**
+- 5a. Scraping fails: System shows error message, logs failure reason
+- 10a. LLM analysis fails: System uses default resume template
+- 13a. LaTeX compilation fails: System shows error, provides raw LaTeX for manual compilation
+
+---
+
+## 10. Non-Functional Requirements
+
+### NFR-001: Performance
+
+**ID:** NFR-001  
+**Description:** System shall process job scraping requests within acceptable time limits  
+**Priority:** Medium  
+**Acceptance Criteria:**
+- Scrape 50 jobs within 5 minutes
+- Generate resume within 30 seconds
+- Dashboard page load under 2 seconds
+- PDF download start within 1 second
+
+### NFR-002: Reliability
+
+**ID:** NFR-002  
+**Description:** System shall handle failures gracefully without data corruption  
+**Priority:** High  
+**Acceptance Criteria:**
+- Failed scraping attempts logged without crashing system
+- Incomplete resume generation does not corrupt database
+- SQLite database auto-recovers from crashes
+- System restarts automatically on Oracle Cloud reboot
+
+### NFR-003: Maintainability
+
+**ID:** NFR-003  
+**Description:** System shall use standard technologies and clear code structure  
+**Priority:** Medium  
+**Acceptance Criteria:**
+- Docker-based deployment for reproducibility
+- Environment-based configuration (no hardcoded secrets)
+- Structured logging with rotation
+- Code comments for complex logic
+
+### NFR-004: Cost Efficiency
+
+**ID:** NFR-004  
+**Description:** System shall operate within Oracle Cloud Always Free tier limits  
+**Priority:** High  
+**Acceptance Criteria:**
+- Memory usage under 8GB (of 24GB available)
+- Storage under 100GB
+- No paid cloud services required for MVP
+- LLM costs under $20/month (Groq paid tier)
+
+### NFR-005: Security
+
+**ID:** NFR-005  
+**Description:** System shall follow security best practices  
+**Priority:** High  
+**Acceptance Criteria:**
+- No credential storage (session-only)
+- Input validation on all API endpoints
+- LaTeX compilation with -no-shell-escape
+- SQLite file permissions 600 (owner read/write only)
+- No sensitive data in logs
+
+### NFR-006: Usability
+
+**ID:** NFR-006  
+**Description:** System shall be usable without training  
+**Priority:** Medium  
+**Acceptance Criteria:**
+- Clear button labels and actions
+- Progress indicators for long operations
+- Error messages in plain language
+- Mobile-responsive dashboard
+
+---
+
+## 11. Data Requirements
+
+### 11.1 Entities
+
+**Job:**
+- job_id (primary key)
+- url (unique, indexed)
+- title
+- company
+- description (raw HTML)
+- parsed_jd (JSON)
+- portal (LinkedIn, Indeed, Naukri)
+- location
+- posting_date
+- status (enum: new, resume_generated, applied, interview, rejected, closed)
+- resume_path
+- created_at
+- updated_at
+
+**ApplicationLog:**
+- log_id (primary key)
+- job_id (foreign key)
+- old_status
+- new_status
+- changed_at
+
+### 11.2 Data Ownership
+- All data stored locally on Oracle Cloud instance
+- User retains full ownership of resumes and job data
+
+### 11.3 Data Privacy
+- No personal data transmitted to third parties except:
+  - Job URLs sent to Groq for analysis (content only, no user identity)
+  - Public job postings scraped from portals
+
+### 11.4 Data Retention
+- Jobs retained indefinitely until manually deleted
+- Resume PDFs retained until manually deleted
+- Logs rotated monthly (keep 3 months)
+
+---
+
+## 12. Security Requirements
+
+### SEC-001: No Credential Storage
+
+**ID:** SEC-001  
+**Description:** System shall not store user passwords or portal credentials  
+**Priority:** Critical  
+**Acceptance Criteria:**
+- Session cookies only for authenticated portals
+- No password fields in database schema
+- Manual login required for protected portals
+
+### SEC-002: Input Validation
+
+**ID:** SEC-002  
+**Description:** System shall validate all user inputs  
+**Priority:** High  
+**Acceptance Criteria:**
+- SQL injection prevention via parameterized queries
+- XSS prevention via output encoding
+- File path validation for resume downloads
+- Maximum input lengths enforced
+
+### SEC-003: LaTeX Security
+
+**ID:** SEC-003  
+**Description:** LaTeX compilation shall be sandboxed  
+**Priority:** High  
+**Acceptance Criteria:**
+- -no-shell-escape flag mandatory
+- Denylist for dangerous LaTeX commands (\input, \include, \write18)
+- Compilation in temporary directory
+- Timeout on compilation (30 seconds)
+
+### SEC-004: Rate Limiting
+
+**ID:** SEC-004  
+**Description:** System shall implement rate limiting for scraping  
+**Priority:** High  
+**Acceptance Criteria:**
+- Minimum 5-second delay between requests to same portal
+- Maximum 100 requests per hour per portal
+- Exponential backoff on 429 responses
+- User-Agent rotation
+
+### SEC-005: Logging
+
+**ID:** SEC-005  
+**Description:** System shall log security-relevant events  
+**Priority:** Medium  
+**Acceptance Criteria:**
+- Failed scraping attempts logged
+- LaTeX compilation failures logged
+- Database errors logged
+- No passwords or secrets in logs
+
+---
+
+## 13. Integrations
+
+| System | Purpose | Integration Method | Data Exchanged |
+|--------|---------|-------------------|----------------|
+| Groq API | LLM for JD analysis | HTTPS REST API | Job description text → Parsed requirements |
+| LinkedIn | Job scraping | Playwright browser automation | Public job listings |
+| Indeed | Job scraping | Playwright browser automation | Public job listings |
+| Naukri | Job scraping | Playwright browser automation | Public job listings |
+| Company Career Pages | Job discovery | Playwright browser automation | Public job postings |
+| Oracle Object Storage (Optional) | Resume backup | S3-compatible API | PDF files |
+
+---
+
+## 14. Assumptions
+
+1. User has Oracle Cloud account and can provision Always Free resources
+2. Job portals provide public access to listings without authentication for basic scraping
+3. User will manually review each generated resume before application
+4. Single-user system sufficient for MVP (no multi-tenancy)
+5. English-language support sufficient for initial release
+6. User has basic technical knowledge to manage Docker deployment
+7. Groq API remains available and affordable ($0.0009/1K tokens)
+8. Playwright functions correctly on ARM architecture (with Firefox fallback if needed)
+
+---
+
+## 15. Constraints
+
+1. **Infrastructure:** Must run on Oracle Cloud Always Free Tier (ARM, 24GB RAM)
+2. **Cost:** Near-zero operational cost (under $20/month total)
+3. **Legal:** No automated application submission (manual only)
+4. **Compliance:** No cold email automation (CAN-SPAM/GDPR)
+5. **Database:** SQLite for MVP (no PostgreSQL complexity)
+6. **Architecture:** Single server deployment (no multi-cloud)
+7. **Browser:** Playwright with ARM compatibility constraints
+
+---
+
+## 16. Risks
+
+| Risk | Impact | Probability | Mitigation |
+|------|--------|-------------|------------|
+| Playwright fails on ARM | High | Medium | Test immediately; use Firefox fallback; x86 emulation if needed |
+| Job portals block scraping | High | High | Rate limiting; User-Agent rotation; residential proxy fallback |
+| LLM costs exceed budget | Medium | Low | Use local Ollama for development; Groq only for production |
+| LaTeX compilation security | High | Low | -no-shell-escape; command denylist; timeout enforcement |
+| Data loss on server failure | Medium | Low | Daily backups to Oracle Object Storage; SQLite WAL mode |
+| Oracle Cloud terminates free tier | High | Low | Portable Docker setup; easy migration to AWS/DigitalOcean |
+
+---
+
+## 17. Success Criteria
+
+| Metric | Target | Measurement |
+|--------|--------|-------------|
+| Job scraping time | < 5 min for 50 jobs | Manual timing |
+| Resume generation time | < 30 seconds | API response time |
+| Resume generation success rate | > 95% | Failed vs successful compilations |
+| User daily time savings | > 2 hours | User self-reporting |
+| System uptime | > 99% | Uptime monitoring |
+| Monthly operational cost | < $20 | Actual billing |
+| Interview callback rate improvement | > 20% | User self-reporting |
+
+---
+
+## 18. Glossary
+
+| Term | Definition |
+|------|------------|
+| ATS | Applicant Tracking System - software used by employers to manage recruitment |
+| JD | Job Description - details about a job posting |
+| LaTeX | Document preparation system for high-quality typesetting |
+| Playwright | Browser automation library for web scraping |
+| SQLite | File-based relational database |
+| ARM | Processor architecture (used by Oracle Cloud free tier) |
+| TOS | Terms of Service - legal agreement for using services |

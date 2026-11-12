@@ -1,0 +1,43 @@
+# System Architecture Document
+
+## Document Control
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0 | 2024-01-15 | AI Architecture Team | Initial architecture based on consolidated decisions |
+
+---
+
+## 1. Architecture Overview
+
+### 1.1 Selected Architecture: Modular Monolith
+
+**Decision:** Deploy as a modular monolith using Docker Compose on a single Oracle Cloud instance.
+
+**Reasoning:**
+- **Simplicity:** Single server, single codebase, single deployment artifact
+- **Resource Efficiency:** Shared memory and CPU across modules; no inter-service network overhead
+- **Cost:** Fits within Oracle Cloud Always Free tier (4 ARM cores, 24GB RAM)
+- **Maintainability:** One codebase to understand, debug, and extend
+- **Sufficient for Requirements:** Single-user system with moderate concurrency needs
+
+**Trade-offs:**
+- Cannot scale individual components independently (acceptable for single-user MVP)
+- Single point of failure (mitigated by simple backup strategy)
+- Limited technology diversity per module (acceptable)
+
+**Why Not Microservices:**
+- Multi-cloud abandoned per user decision
+- Network latency between services unnecessary overhead
+- Operational complexity (service discovery, distributed tracing) not justified
+- Memory overhead of multiple service instances problematic on free tier
+
+**Why Not Serverless:**
+- Playwright browser automation requires persistent browser contexts
+- 15-minute Lambda timeout insufficient for batch scraping
+- Cold start latency unacceptable for interactive resume generation
+- ARM architecture complications with Lambda layers
+
+---
+
+## 2. High-Level Architecture
