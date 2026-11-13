@@ -4,6 +4,8 @@ A local-only autonomous job application system. Scrapes job portals, generates A
 
 ---
 
+## Backend Code URL : https://github.com/Gaurav-SonkaR/Auto-Applier-Backend
+
 ## Architecture
 
 ```
